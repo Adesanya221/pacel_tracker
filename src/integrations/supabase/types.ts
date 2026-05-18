@@ -14,7 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      shipments: {
+        Row: {
+          created_at: string
+          delivered_at: string | null
+          delivered_done: boolean
+          delivered_location: string | null
+          destination_address: string
+          estimated_delivery_date: string
+          id: string
+          in_transit_at: string | null
+          in_transit_done: boolean
+          in_transit_location: string | null
+          origin_address: string
+          out_for_delivery_at: string | null
+          out_for_delivery_done: boolean
+          out_for_delivery_location: string | null
+          package_description: string | null
+          picked_up_at: string | null
+          picked_up_done: boolean
+          picked_up_location: string | null
+          processing_at: string | null
+          processing_done: boolean
+          processing_location: string | null
+          recipient_email: string
+          recipient_name: string
+          sender_name: string
+          shipment_date: string
+          tracking_number: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          delivered_at?: string | null
+          delivered_done?: boolean
+          delivered_location?: string | null
+          destination_address: string
+          estimated_delivery_date: string
+          id?: string
+          in_transit_at?: string | null
+          in_transit_done?: boolean
+          in_transit_location?: string | null
+          origin_address: string
+          out_for_delivery_at?: string | null
+          out_for_delivery_done?: boolean
+          out_for_delivery_location?: string | null
+          package_description?: string | null
+          picked_up_at?: string | null
+          picked_up_done?: boolean
+          picked_up_location?: string | null
+          processing_at?: string | null
+          processing_done?: boolean
+          processing_location?: string | null
+          recipient_email: string
+          recipient_name: string
+          sender_name: string
+          shipment_date?: string
+          tracking_number: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          delivered_at?: string | null
+          delivered_done?: boolean
+          delivered_location?: string | null
+          destination_address?: string
+          estimated_delivery_date?: string
+          id?: string
+          in_transit_at?: string | null
+          in_transit_done?: boolean
+          in_transit_location?: string | null
+          origin_address?: string
+          out_for_delivery_at?: string | null
+          out_for_delivery_done?: boolean
+          out_for_delivery_location?: string | null
+          package_description?: string | null
+          picked_up_at?: string | null
+          picked_up_done?: boolean
+          picked_up_location?: string | null
+          processing_at?: string | null
+          processing_done?: boolean
+          processing_location?: string | null
+          recipient_email?: string
+          recipient_name?: string
+          sender_name?: string
+          shipment_date?: string
+          tracking_number?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
