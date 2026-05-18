@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Package2 } from "lucide-react";
+import { Package2, Settings } from "lucide-react";
 
 export function SiteHeader() {
   return (
@@ -16,8 +16,11 @@ export function SiteHeader() {
             Parcel<span className="text-secondary">Trace</span>
           </span>
         </Link>
-        <nav className="text-sm text-muted-foreground hidden sm:block">
-          <span className="font-mono">Demo Tracking Portal</span>
+        <nav className="flex items-center gap-4 text-sm">
+          <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">Track</Link>
+          <Link to="/admin" className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+            <Settings className="h-4 w-4" /> Admin
+          </Link>
         </nav>
       </div>
     </header>
