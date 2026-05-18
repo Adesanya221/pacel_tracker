@@ -222,17 +222,17 @@ function ShipmentCard({ shipment, onDelete }: { shipment: Shipment; onDelete: ()
 
   const toggle = useMutation({
     mutationFn: async ({ key, checked }: { key: StageKey; checked: boolean }) => {
-      const update: Record<string, unknown> = {
+      const update: Partial<Shipment> = {
         [`${key}_done`]: checked,
         [`${key}_at`]: checked ? new Date().toISOString() : null,
-      };
+      } as Partial<Shipment>;
       if (checked && !shipment[`${key}_location` as const]) {
         const loc = key === "processing" || key === "picked_up"
           ? shipment.origin_address
           : key === "in_transit"
           ? "In transit hub"
           : shipment.destination_address;
-        update[`${key}_location`] = loc;
+        (update as Record<string, unknown>)[`${key}_location`] = loc;
       }
       const { error } = await supabase.from("shipments").update(update).eq("id", shipment.id);
       if (error) throw error;
