@@ -1,8 +1,10 @@
-// Deterministic fake tracking data generator based on tracking number
+import { supabase } from "@/integrations/supabase/client";
+
+export type StageKey = "processing" | "picked_up" | "in_transit" | "out_for_delivery" | "delivered";
 export type StageStatus = "complete" | "current" | "pending";
 
 export interface TimelineStage {
-  key: string;
+  key: StageKey;
   label: string;
   description: string;
   location: string;
@@ -10,171 +12,110 @@ export interface TimelineStage {
   status: StageStatus;
 }
 
-export interface TrackingData {
-  trackingNumber: string;
-  service: string;
-  weight: string;
-  status: string;
-  statusDetail: string;
-  estimatedDelivery: string;
-  origin: { city: string; region: string; lat: number; lng: number };
-  destination: { city: string; region: string; lat: number; lng: number };
-  current: { city: string; region: string; lat: number; lng: number };
-  progress: number; // 0..1
-  stages: TimelineStage[];
+export interface Shipment {
+  id: string;
+  tracking_number: string;
+  sender_name: string;
+  recipient_name: string;
+  recipient_email: string;
+  origin_address: string;
+  destination_address: string;
+  package_description: string | null;
+  shipment_date: string;
+  estimated_delivery_date: string;
+  processing_done: boolean;
+  processing_at: string | null;
+  processing_location: string | null;
+  picked_up_done: boolean;
+  picked_up_at: string | null;
+  picked_up_location: string | null;
+  in_transit_done: boolean;
+  in_transit_at: string | null;
+  in_transit_location: string | null;
+  out_for_delivery_done: boolean;
+  out_for_delivery_at: string | null;
+  out_for_delivery_location: string | null;
+  delivered_done: boolean;
+  delivered_at: string | null;
+  delivered_location: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
-const CITIES = [
-  { city: "Memphis", region: "TN, USA", lat: 35.1495, lng: -90.049 },
-  { city: "Los Angeles", region: "CA, USA", lat: 34.0522, lng: -118.2437 },
-  { city: "Chicago", region: "IL, USA", lat: 41.8781, lng: -87.6298 },
-  { city: "New York", region: "NY, USA", lat: 40.7128, lng: -74.006 },
-  { city: "Dallas", region: "TX, USA", lat: 32.7767, lng: -96.797 },
-  { city: "Atlanta", region: "GA, USA", lat: 33.749, lng: -84.388 },
-  { city: "Seattle", region: "WA, USA", lat: 47.6062, lng: -122.3321 },
-  { city: "Miami", region: "FL, USA", lat: 25.7617, lng: -80.1918 },
-  { city: "Denver", region: "CO, USA", lat: 39.7392, lng: -104.9903 },
-  { city: "Boston", region: "MA, USA", lat: 42.3601, lng: -71.0589 },
+export const STAGE_DEFS: { key: StageKey; label: string; description: string }[] = [
+  { key: "processing", label: "Order Received / Processing", description: "Shipment information received. Package is being prepared." },
+  { key: "picked_up", label: "Picked Up", description: "Package picked up by courier." },
+  { key: "in_transit", label: "In Transit", description: "Package is moving through our network." },
+  { key: "out_for_delivery", label: "Out for Delivery", description: "On a delivery vehicle, arriving today." },
+  { key: "delivered", label: "Delivered", description: "Package delivered to recipient." },
 ];
 
-const SERVICES = ["Express Saver", "Priority Overnight", "Ground", "International Priority", "2Day"];
+export function isValidTrackingNumber(v: string): boolean {
+  return /^\d{16}$/.test(v.trim());
+}
 
-function hash(str: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i);
-    h = Math.imul(h, 16777619);
+export function generateTrackingNumber(): string {
+  let n = "";
+  for (let i = 0; i < 16; i++) n += Math.floor(Math.random() * 10).toString();
+  return n;
+}
+
+export function getCurrentStatus(s: Shipment): { label: string; key: StageKey | "pending" } {
+  const order: StageKey[] = ["processing", "picked_up", "in_transit", "out_for_delivery", "delivered"];
+  let last: StageKey | "pending" = "pending";
+  let label = "Pending";
+  for (const k of order) {
+    if (s[`${k}_done` as const]) {
+      last = k;
+      label = STAGE_DEFS.find((d) => d.key === k)!.label;
+    }
   }
-  return Math.abs(h);
+  return { label, key: last };
 }
 
-function seeded(seed: number) {
-  let s = seed || 1;
-  return () => {
-    s = (s * 9301 + 49297) % 233280;
-    return s / 233280;
-  };
+export function getProgress(s: Shipment): number {
+  const order: StageKey[] = ["processing", "picked_up", "in_transit", "out_for_delivery", "delivered"];
+  let count = 0;
+  for (const k of order) if (s[`${k}_done` as const]) count++;
+  return count / order.length;
 }
 
-function pick<T>(arr: T[], rng: () => number): T {
-  return arr[Math.floor(rng() * arr.length)];
-}
-
-function formatDate(d: Date): string {
-  return d.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
+export function buildTimeline(s: Shipment): TimelineStage[] {
+  const order: StageKey[] = ["processing", "picked_up", "in_transit", "out_for_delivery", "delivered"];
+  const lastDone = [...order].reverse().find((k) => s[`${k}_done` as const]);
+  return STAGE_DEFS.map((def) => {
+    const done = s[`${def.key}_done` as const];
+    const at = s[`${def.key}_at` as const] as string | null;
+    const loc = s[`${def.key}_location` as const] as string | null;
+    const isCurrent = done && def.key === lastDone;
+    return {
+      key: def.key,
+      label: def.label,
+      description: def.description,
+      location: loc || (def.key === "processing" || def.key === "picked_up" ? s.origin_address : def.key === "delivered" || def.key === "out_for_delivery" ? s.destination_address : "—"),
+      timestamp: at ? new Date(at).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) : "Pending",
+      status: done ? (isCurrent ? "current" : "complete") : "pending",
+    };
   });
 }
 
-function formatDateTime(d: Date): string {
-  return d.toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
+export async function fetchShipment(trackingNumber: string): Promise<Shipment | null> {
+  const { data, error } = await supabase
+    .from("shipments")
+    .select("*")
+    .eq("tracking_number", trackingNumber.trim())
+    .maybeSingle();
+  if (error) throw error;
+  return data as Shipment | null;
 }
 
-export function generateTracking(rawNumber: string): TrackingData {
-  const trackingNumber = rawNumber.trim().toUpperCase();
-  const seed = hash(trackingNumber);
-  const rng = seeded(seed);
-
-  let origin = pick(CITIES, rng);
-  let destination = pick(CITIES, rng);
-  while (destination.city === origin.city) destination = pick(CITIES, rng);
-  const transitHub = pick(CITIES.filter((c) => c.city !== origin.city && c.city !== destination.city), rng);
-
-  // Progress 0..4 corresponds to stage index
-  const stageIndex = Math.floor(rng() * 5); // 0..4
-  const progress = stageIndex / 4;
-
-  const now = new Date();
-  const pickupDate = new Date(now.getTime() - (3 + rng() * 2) * 86400000);
-  const inTransitDate = new Date(pickupDate.getTime() + 12 * 3600000);
-  const hubDate = new Date(pickupDate.getTime() + 36 * 3600000);
-  const outForDeliveryDate = new Date(pickupDate.getTime() + 60 * 3600000);
-  const deliveredDate = new Date(pickupDate.getTime() + 66 * 3600000);
-  const eta = new Date(pickupDate.getTime() + 66 * 3600000);
-
-  const stageDefs = [
-    {
-      key: "label",
-      label: "Label Created",
-      description: "Shipping label has been created. Package awaiting pickup.",
-      location: `${origin.city}, ${origin.region}`,
-      date: pickupDate,
-    },
-    {
-      key: "pickup",
-      label: "Picked Up",
-      description: "Package picked up by courier.",
-      location: `${origin.city}, ${origin.region}`,
-      date: new Date(pickupDate.getTime() + 2 * 3600000),
-    },
-    {
-      key: "transit",
-      label: "In Transit",
-      description: `Arrived at sorting facility in ${transitHub.city}.`,
-      location: `${transitHub.city}, ${transitHub.region}`,
-      date: hubDate,
-    },
-    {
-      key: "out",
-      label: "Out for Delivery",
-      description: "On vehicle for delivery.",
-      location: `${destination.city}, ${destination.region}`,
-      date: outForDeliveryDate,
-    },
-    {
-      key: "delivered",
-      label: "Delivered",
-      description: "Package delivered. Signed by recipient.",
-      location: `${destination.city}, ${destination.region}`,
-      date: deliveredDate,
-    },
-  ];
-
-  const stages: TimelineStage[] = stageDefs.map((s, i) => ({
-    key: s.key,
-    label: s.label,
-    description: s.description,
-    location: s.location,
-    timestamp: i <= stageIndex ? formatDateTime(s.date) : "Pending",
-    status: i < stageIndex ? "complete" : i === stageIndex ? "current" : "pending",
-  }));
-
-  // Current location based on progress
-  let current = origin;
-  if (stageIndex === 0 || stageIndex === 1) current = origin;
-  else if (stageIndex === 2) current = transitHub;
-  else current = destination;
-
-  const statusMap: Record<number, { status: string; detail: string }> = {
-    0: { status: "Label Created", detail: "Awaiting pickup from sender" },
-    1: { status: "Picked Up", detail: "On the way to sorting facility" },
-    2: { status: "In Transit", detail: `Moving through ${transitHub.city} hub` },
-    3: { status: "Out for Delivery", detail: "Arriving today" },
-    4: { status: "Delivered", detail: "Package handed to recipient" },
-  };
-
-  const weight = (1 + rng() * 25).toFixed(1) + " lbs";
-
-  return {
-    trackingNumber,
-    service: pick(SERVICES, rng),
-    weight,
-    status: statusMap[stageIndex].status,
-    statusDetail: statusMap[stageIndex].detail,
-    estimatedDelivery: formatDate(eta),
-    origin: { city: origin.city, region: origin.region, lat: origin.lat, lng: origin.lng },
-    destination: { city: destination.city, region: destination.region, lat: destination.lat, lng: destination.lng },
-    current: { city: current.city, region: current.region, lat: current.lat, lng: current.lng },
-    progress,
-    stages,
-  };
+export function addBusinessDays(start: Date, days: number): Date {
+  const d = new Date(start);
+  let added = 0;
+  while (added < days) {
+    d.setDate(d.getDate() + 1);
+    const dow = d.getDay();
+    if (dow !== 0 && dow !== 6) added++;
+  }
+  return d;
 }

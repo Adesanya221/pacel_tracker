@@ -1,19 +1,23 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Search, Package } from "lucide-react";
+import { isValidTrackingNumber } from "@/lib/tracking";
 
 export function TrackingForm({ initial = "" }: { initial?: string }) {
   const [value, setValue] = useState(initial);
+  const [err, setErr] = useState<string | null>(null);
   const navigate = useNavigate();
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const v = value.trim();
-    if (!v) return;
+    if (!isValidTrackingNumber(v)) {
+      setErr("Tracking number must be exactly 16 digits.");
+      return;
+    }
+    setErr(null);
     navigate({ to: "/track/$id", params: { id: v } });
   }
-
-  const samples = ["1Z999AA10123456784", "FX284763991", "TRK20260517DEMO"];
 
   return (
     <form onSubmit={submit} className="w-full max-w-2xl mx-auto">
@@ -22,11 +26,18 @@ export function TrackingForm({ initial = "" }: { initial?: string }) {
           <Package className="h-5 w-5 text-muted-foreground shrink-0" />
           <input
             value={value}
-            onChange={(e) => setValue(e.target.value)}
-            placeholder="Enter tracking number"
-            className="w-full bg-transparent py-3 outline-none text-foreground placeholder:text-muted-foreground"
+            onChange={(e) => {
+              const digits = e.target.value.replace(/\D/g, "").slice(0, 16);
+              setValue(digits);
+              if (err) setErr(null);
+            }}
+            placeholder="Enter 16-digit tracking number"
+            inputMode="numeric"
+            maxLength={16}
+            className="w-full bg-transparent py-3 outline-none text-foreground placeholder:text-muted-foreground font-mono tracking-wider"
             aria-label="Tracking number"
           />
+          <span className="text-xs text-muted-foreground font-mono shrink-0">{value.length}/16</span>
         </div>
         <button
           type="submit"
@@ -37,19 +48,7 @@ export function TrackingForm({ initial = "" }: { initial?: string }) {
           Track
         </button>
       </div>
-      <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
-        <span>Try:</span>
-        {samples.map((s) => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => setValue(s)}
-            className="rounded-full border border-border bg-card px-3 py-1 font-mono hover:border-primary hover:text-primary transition-colors"
-          >
-            {s}
-          </button>
-        ))}
-      </div>
+      {err && <p className="mt-2 text-sm text-destructive text-center">{err}</p>}
     </form>
   );
 }
