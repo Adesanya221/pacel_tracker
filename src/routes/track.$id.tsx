@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, MapPin, Package, Calendar, User, Mail, AlertCircle } from "lucide-react";
+import { ArrowLeft, MapPin, Package, Calendar, User, Mail, AlertCircle, ShieldAlert, ExternalLink } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { TrackingForm } from "@/components/TrackingForm";
 import { Timeline } from "@/components/Timeline";
 import { fetchShipment, buildTimeline, getCurrentStatus, getProgress, isValidTrackingNumber } from "@/lib/tracking";
+import { getCustomsHold } from "@/lib/customs";
 
 export const Route = createFileRoute("/track/$id")({
   head: ({ params }) => ({
@@ -80,9 +81,38 @@ function ShipmentView({ data }: { data: import("@/lib/tracking").Shipment }) {
   const eta = new Date(data.estimated_delivery_date).toLocaleDateString("en-US", {
     weekday: "long", month: "long", day: "numeric", year: "numeric",
   });
+  const customsHold = getCustomsHold(data.tracking_number);
 
   return (
     <div className="space-y-6">
+      {/* Customs / Clearance Hold Warning */}
+      {customsHold && (
+        <section className="rounded-2xl border-2 border-destructive/40 bg-destructive/5 p-5 sm:p-6">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10 shrink-0">
+              <ShieldAlert className="h-5 w-5 text-destructive" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-destructive text-base">Shipment Held — Customs Clearance Required</h3>
+              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                Your package has been delayed at customs and requires a clearance fee of{" "}
+                <span className="font-bold text-foreground">
+                  {new Intl.NumberFormat("en-US", { style: "currency", currency: customsHold.feeCurrency }).format(customsHold.feeAmount)}
+                </span>{" "}
+                before delivery can be completed. This is a mandatory regulatory requirement.
+              </p>
+              <a
+                href={`/clearance/${data.tracking_number}`}
+                className="mt-3 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+                style={{ background: "var(--gradient-primary)" }}
+              >
+                <ExternalLink className="h-4 w-4" />
+                View Details & Pay Fee
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
       <section className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>

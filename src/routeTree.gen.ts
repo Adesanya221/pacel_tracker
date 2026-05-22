@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TrackIdRouteImport } from './routes/track.$id'
+import { Route as ClearanceIdRouteImport } from './routes/clearance.$id'
 
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
@@ -28,34 +29,43 @@ const TrackIdRoute = TrackIdRouteImport.update({
   path: '/track/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClearanceIdRoute = ClearanceIdRouteImport.update({
+  id: '/clearance/$id',
+  path: '/clearance/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/clearance/$id': typeof ClearanceIdRoute
   '/track/$id': typeof TrackIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/clearance/$id': typeof ClearanceIdRoute
   '/track/$id': typeof TrackIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/clearance/$id': typeof ClearanceIdRoute
   '/track/$id': typeof TrackIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/track/$id'
+  fullPaths: '/' | '/admin' | '/clearance/$id' | '/track/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/track/$id'
-  id: '__root__' | '/' | '/admin' | '/track/$id'
+  to: '/' | '/admin' | '/clearance/$id' | '/track/$id'
+  id: '__root__' | '/' | '/admin' | '/clearance/$id' | '/track/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  ClearanceIdRoute: typeof ClearanceIdRoute
   TrackIdRoute: typeof TrackIdRoute
 }
 
@@ -82,14 +92,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrackIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/clearance/$id': {
+      id: '/clearance/$id'
+      path: '/clearance/$id'
+      fullPath: '/clearance/$id'
+      preLoaderRoute: typeof ClearanceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  ClearanceIdRoute: ClearanceIdRoute,
   TrackIdRoute: TrackIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
