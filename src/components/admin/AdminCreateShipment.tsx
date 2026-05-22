@@ -139,12 +139,14 @@ export function AdminCreateShipment({ onNavigate }: { onNavigate: (view: AdminVi
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
               label="Sender name"
+              placeholder="John Anderson"
               required
               value={form.sender_name}
               onChange={(v) => setForm({ ...form, sender_name: v })}
             />
             <FormField
               label="Recipient name"
+              placeholder="Michael Thompson"
               required
               value={form.recipient_name}
               onChange={(v) => setForm({ ...form, recipient_name: v })}
@@ -152,23 +154,27 @@ export function AdminCreateShipment({ onNavigate }: { onNavigate: (view: AdminVi
             <FormField
               label="Recipient email"
               type="email"
+              placeholder="recipient@email.com"
               required
               value={form.recipient_email}
               onChange={(v) => setForm({ ...form, recipient_email: v })}
             />
             <FormField
               label="Package description"
+              placeholder="Electronics, documents, apparel, etc."
               value={form.package_description}
               onChange={(v) => setForm({ ...form, package_description: v })}
             />
             <FormField
               label="Origin / pickup address"
+              placeholder="1425 Market St, San Francisco, CA 94103"
               required
               value={form.origin_address}
               onChange={(v) => setForm({ ...form, origin_address: v })}
             />
             <FormField
               label="Destination / delivery address"
+              placeholder="742 Evergreen Terrace, Springfield, IL 62704"
               required
               value={form.destination_address}
               onChange={(v) => setForm({ ...form, destination_address: v })}
@@ -223,12 +229,14 @@ function FormField({
   onChange,
   type = "text",
   required,
+  placeholder,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   type?: string;
   required?: boolean;
+  placeholder?: string;
 }) {
   return (
     <div>
@@ -241,7 +249,8 @@ function FormField({
         required={required}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary transition-colors"
+        placeholder={placeholder}
+        className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary transition-colors placeholder:text-muted-foreground/50"
       />
     </div>
   );

@@ -359,7 +359,9 @@ function Index() {
               <h4 className="font-semibold text-sm mb-3">Contact</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><a href="mailto:support@parceltrace.com" className="hover:text-foreground transition-colors">support@parceltrace.com</a></li>
+                <li><a href="tel:+18009827225" className="hover:text-foreground transition-colors">+1 (800) 982-7225</a></li>
                 <li>Available 24/7</li>
+                <li className="pt-1 text-xs leading-relaxed">1200 Peachtree St NE, Suite 400<br />Atlanta, GA 30309, United States</li>
               </ul>
             </div>
           </div>

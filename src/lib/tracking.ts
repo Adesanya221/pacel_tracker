@@ -43,11 +43,11 @@ export interface Shipment {
 }
 
 export const STAGE_DEFS: { key: StageKey; label: string; description: string }[] = [
-  { key: "processing", label: "Order Received / Processing", description: "Shipment information received. Package is being prepared." },
-  { key: "picked_up", label: "Picked Up", description: "Package picked up by courier." },
-  { key: "in_transit", label: "In Transit", description: "Package is moving through our network." },
-  { key: "out_for_delivery", label: "Out for Delivery", description: "On a delivery vehicle, arriving today." },
-  { key: "delivered", label: "Delivered", description: "Package delivered to recipient." },
+  { key: "processing", label: "Order Received / Processing", description: "Shipment information received and logged at origin facility." },
+  { key: "picked_up", label: "Picked Up", description: "Package picked up by courier and scanned at local depot." },
+  { key: "in_transit", label: "In Transit", description: "Package is in transit through the national sorting network." },
+  { key: "out_for_delivery", label: "Out for Delivery", description: "Package loaded onto delivery vehicle — arriving today." },
+  { key: "delivered", label: "Delivered", description: "Package successfully delivered and signed for at destination." },
 ];
 
 export function isValidTrackingNumber(v: string): boolean {
@@ -92,7 +92,7 @@ export function buildTimeline(s: Shipment): TimelineStage[] {
       key: def.key,
       label: def.label,
       description: def.description,
-      location: loc || (def.key === "processing" || def.key === "picked_up" ? s.origin_address : def.key === "delivered" || def.key === "out_for_delivery" ? s.destination_address : "—"),
+      location: loc || (def.key === "processing" || def.key === "picked_up" ? s.origin_address : def.key === "delivered" || def.key === "out_for_delivery" ? s.destination_address : "National Distribution Center, Memphis, TN"),
       timestamp: at ? new Date(at).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) : "Pending",
       status: done ? (isCurrent ? "current" : "complete") : "pending",
     };

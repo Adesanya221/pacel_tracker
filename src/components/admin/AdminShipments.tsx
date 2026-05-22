@@ -129,7 +129,7 @@ function ShipmentCard({ shipment }: { shipment: Shipment }) {
           key === "processing" || key === "picked_up"
             ? shipment.origin_address
             : key === "in_transit"
-              ? "In transit hub"
+              ? "National Distribution Center, Memphis, TN"
               : shipment.destination_address;
         (update as Record<string, unknown>)[`${key}_location`] = loc;
       }
