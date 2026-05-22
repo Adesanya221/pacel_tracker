@@ -91,8 +91,11 @@ function ShipmentView({ data }: { data: import("@/lib/tracking").Shipment }) {
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-destructive text-base">Shipment Held — Customs Action Required</h3>
               <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                Your package has been placed on hold by customs. Please contact our support
-                team by email to resolve this issue. We will follow up with instructions.
+                Your package has been placed on hold by customs. A clearance fee of{" "}
+                <span className="font-bold text-foreground">
+                  {new Intl.NumberFormat("en-US", { style: "currency", currency: customsHold.feeCurrency }).format(customsHold.feeAmount)}
+                </span>{" "}
+                is required. Please contact our support team by email to resolve this issue.
               </p>
               <a
                 href={`/clearance/${data.tracking_number}`}

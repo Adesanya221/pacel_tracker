@@ -7,6 +7,7 @@ import {
   AlertTriangle,
   Clock,
   FileText,
+  CreditCard,
   Package2,
   MapPin,
   Calendar,
@@ -82,6 +83,11 @@ function ClearanceView({
   shipment: import("@/lib/tracking").Shipment;
   hold: CustomsHold;
 }) {
+  const feeFormatted = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: hold.feeCurrency,
+  }).format(hold.feeAmount);
+
   const holdDate = new Date(hold.holdDate).toLocaleDateString("en-US", {
     weekday: "long",
     month: "long",
@@ -158,6 +164,52 @@ function ClearanceView({
               <InfoRow icon={Package2} label="Package Contents" value={shipment.package_description} />
             </div>
           )}
+        </div>
+      </section>
+
+      {/* ── Fee Breakdown ─────────────────────────────── */}
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-[var(--shadow-card)]">
+        <div className="flex items-center gap-2 mb-4">
+          <CreditCard className="h-5 w-5 text-primary" />
+          <h2 className="text-base sm:text-lg font-semibold">Clearance Fee Summary</h2>
+        </div>
+
+        <div className="rounded-xl border border-border overflow-hidden">
+          <table className="w-full text-sm">
+            <tbody>
+              <tr className="border-b border-border">
+                <td className="px-4 py-3 text-muted-foreground">Customs Inspection Fee</td>
+                <td className="px-4 py-3 text-right font-medium">
+                  {new Intl.NumberFormat("en-US", { style: "currency", currency: hold.feeCurrency }).format(hold.feeAmount * 0.6)}
+                </td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="px-4 py-3 text-muted-foreground">Regulatory Processing Fee</td>
+                <td className="px-4 py-3 text-right font-medium">
+                  {new Intl.NumberFormat("en-US", { style: "currency", currency: hold.feeCurrency }).format(hold.feeAmount * 0.25)}
+                </td>
+              </tr>
+              <tr className="border-b border-border">
+                <td className="px-4 py-3 text-muted-foreground">Documentation & Handling</td>
+                <td className="px-4 py-3 text-right font-medium">
+                  {new Intl.NumberFormat("en-US", { style: "currency", currency: hold.feeCurrency }).format(hold.feeAmount * 0.15)}
+                </td>
+              </tr>
+              <tr className="bg-muted/30">
+                <td className="px-4 py-3 font-semibold text-foreground">Total Amount Due</td>
+                <td className="px-4 py-3 text-right font-bold text-lg text-foreground">
+                  {feeFormatted}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-4 flex items-start gap-2 rounded-xl bg-primary/5 border border-primary/20 p-3">
+          <Mail className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            To arrange payment and complete clearance, please <span className="font-semibold text-foreground">contact our support team by email</span>. We will provide payment instructions and guide you through the process.
+          </p>
         </div>
       </section>
 
