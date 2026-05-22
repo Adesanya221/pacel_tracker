@@ -7,16 +7,12 @@ import {
   AlertTriangle,
   Clock,
   FileText,
-  Scale,
-  CreditCard,
   Package2,
   MapPin,
   Calendar,
   Hash,
-  CheckCircle2,
-  Info,
-  Phone,
   Mail,
+  MessageCircle,
 } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { fetchShipment, isValidTrackingNumber } from "@/lib/tracking";
@@ -86,27 +82,11 @@ function ClearanceView({
   shipment: import("@/lib/tracking").Shipment;
   hold: CustomsHold;
 }) {
-  const feeFormatted = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: hold.feeCurrency,
-  }).format(hold.feeAmount);
-
   const holdDate = new Date(hold.holdDate).toLocaleDateString("en-US", {
     weekday: "long",
     month: "long",
     day: "numeric",
     year: "numeric",
-  });
-
-  const deadlineDate = new Date(
-    new Date(hold.holdDate).getTime() + 48 * 60 * 60 * 1000
-  ).toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
   });
 
   return (
@@ -119,12 +99,42 @@ function ClearanceView({
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-destructive">
-              Customs Clearance Required
+              Customs Hold — Action Required
             </h1>
             <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
               Your shipment has been intercepted and placed on hold by the customs
-              authority at the port of entry. A mandatory clearance fee must be settled
-              before the package can be released for final delivery.
+              authority at the port of entry. Please contact our support team by email
+              to resolve this issue and arrange clearance for your package.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Contact Support CTA ───────────────────────── */}
+      <section className="rounded-2xl border-2 border-primary/30 bg-primary/5 p-5 sm:p-6">
+        <div className="flex items-start gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 shrink-0">
+            <Mail className="h-6 w-6 text-primary" />
+          </div>
+          <div className="flex-1">
+            <h2 className="text-lg sm:text-xl font-bold text-foreground">
+              Contact Support to Resolve
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+              Our customs clearance team will guide you through the process and provide
+              all necessary instructions. Please email us with your tracking number and
+              we will respond with next steps within 24 hours.
+            </p>
+            <a
+              href={`mailto:support@parceltrace.com?subject=Customs Hold — ${shipment.tracking_number}&body=Hello,%0A%0AMy shipment (${shipment.tracking_number}) has been placed on customs hold.%0ACustoms Reference: ${hold.referenceNumber}%0A%0APlease advise on how to resolve this.%0A%0AThank you.`}
+              className="mt-4 inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-primary-foreground"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              <Mail className="h-4 w-4" />
+              Email Support Team
+            </a>
+            <p className="mt-3 text-xs text-muted-foreground">
+              support@parceltrace.com — We typically respond within 12–24 hours.
             </p>
           </div>
         </div>
@@ -151,55 +161,6 @@ function ClearanceView({
         </div>
       </section>
 
-      {/* ── Fee Breakdown ─────────────────────────────── */}
-      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-[var(--shadow-card)]">
-        <div className="flex items-center gap-2 mb-4">
-          <CreditCard className="h-5 w-5 text-primary" />
-          <h2 className="text-base sm:text-lg font-semibold">Clearance Fee Summary</h2>
-        </div>
-
-        <div className="rounded-xl border border-border overflow-hidden">
-          <table className="w-full text-sm">
-            <tbody>
-              <tr className="border-b border-border">
-                <td className="px-4 py-3 text-muted-foreground">Customs Inspection Fee</td>
-                <td className="px-4 py-3 text-right font-medium">
-                  {new Intl.NumberFormat("en-US", { style: "currency", currency: hold.feeCurrency }).format(hold.feeAmount * 0.6)}
-                </td>
-              </tr>
-              <tr className="border-b border-border">
-                <td className="px-4 py-3 text-muted-foreground">Regulatory Processing Fee</td>
-                <td className="px-4 py-3 text-right font-medium">
-                  {new Intl.NumberFormat("en-US", { style: "currency", currency: hold.feeCurrency }).format(hold.feeAmount * 0.25)}
-                </td>
-              </tr>
-              <tr className="border-b border-border">
-                <td className="px-4 py-3 text-muted-foreground">Documentation & Handling</td>
-                <td className="px-4 py-3 text-right font-medium">
-                  {new Intl.NumberFormat("en-US", { style: "currency", currency: hold.feeCurrency }).format(hold.feeAmount * 0.15)}
-                </td>
-              </tr>
-              <tr className="bg-muted/30">
-                <td className="px-4 py-3 font-semibold text-foreground">Total Amount Due</td>
-                <td className="px-4 py-3 text-right font-bold text-lg text-foreground">
-                  {feeFormatted}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-4 flex items-start gap-2 rounded-xl bg-destructive/5 border border-destructive/20 p-3">
-          <Clock className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
-          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            <span className="font-semibold text-destructive">Payment Deadline:</span>{" "}
-            {deadlineDate}. Failure to remit payment within the specified timeframe may
-            result in the shipment being returned to the sender or held indefinitely at
-            the customs facility, subject to additional storage charges.
-          </p>
-        </div>
-      </section>
-
       {/* ── Reason & Hold Details ─────────────────────── */}
       <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-[var(--shadow-card)]">
         <div className="flex items-center gap-2 mb-4">
@@ -208,73 +169,24 @@ function ClearanceView({
         </div>
         <p className="text-sm text-foreground leading-relaxed">{hold.reason}</p>
         <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
-          Under applicable international trade regulations and customs enforcement
-          protocols, all inbound parcels are subject to random or targeted inspection.
-          When a shipment is flagged, it must undergo a formal clearance process before
-          it can proceed to its final destination. The associated fees cover the cost of
-          inspection, documentation review, regulatory compliance verification, and
-          administrative processing by the relevant customs authority.
+          Under applicable international trade regulations, all inbound parcels are
+          subject to random or targeted inspection. When a shipment is flagged, it must
+          undergo a formal clearance process before it can proceed to its final
+          destination.
         </p>
       </section>
 
-      {/* ── Legal Framework ───────────────────────────── */}
-      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-[var(--shadow-card)]">
-        <div className="flex items-center gap-2 mb-4">
-          <Scale className="h-5 w-5 text-primary" />
-          <h2 className="text-base sm:text-lg font-semibold">Regulatory & Legal Basis</h2>
-        </div>
-        <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
-          <p>
-            This customs clearance fee is imposed in accordance with the following
-            regulatory frameworks and international trade agreements:
-          </p>
-          <ul className="space-y-3 list-none">
-            <LegalItem
-              title="World Customs Organization (WCO) Guidelines"
-              text="Under the Revised Kyoto Convention on the Simplification and Harmonization of Customs Procedures, customs authorities are authorized to collect processing fees for inspections conducted on imported goods. These fees ensure compliance with national security, public health, and trade standards."
-            />
-            <LegalItem
-              title="International Trade Administration (ITA) Regulations"
-              text="Shipments crossing international borders are subject to duties, taxes, and administrative charges as determined by the importing country's tariff schedule and customs regulations. The recipient is responsible for all applicable fees."
-            />
-            <LegalItem
-              title="Customs Tariff Act — Import Clearance"
-              text="All goods entering the country are subject to assessment by the customs authority. Where a shipment is selected for detailed examination, the associated inspection and handling fees are the responsibility of the consignee or their appointed agent."
-            />
-            <LegalItem
-              title="Consumer Protection Notice"
-              text="This fee is a standard regulatory charge applied uniformly to all flagged shipments. It is not a penalty. Non-payment within the stipulated period may result in the package being returned to the origin country at the sender's expense, or being held in a bonded warehouse subject to escalating daily storage fees."
-            />
-          </ul>
-        </div>
-      </section>
-
-      {/* ── Payment Instructions ──────────────────────── */}
-      <section className="rounded-2xl border-2 border-primary/30 bg-primary/5 p-5 sm:p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <CreditCard className="h-5 w-5 text-primary" />
-          <h2 className="text-base sm:text-lg font-semibold text-foreground">
-            How to Pay
-          </h2>
-        </div>
-        <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
-          {hold.paymentInstructions}
-        </p>
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="rounded-xl border border-border bg-card p-4 text-center">
-            <CreditCard className="mx-auto h-6 w-6 text-primary mb-2" />
-            <p className="text-xs font-semibold">Credit / Debit Card</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Visa, Mastercard, Amex</p>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-4 text-center">
-            <Package2 className="mx-auto h-6 w-6 text-primary mb-2" />
-            <p className="text-xs font-semibold">Bank Transfer</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Wire or ACH transfer</p>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-4 text-center">
-            <CheckCircle2 className="mx-auto h-6 w-6 text-primary mb-2" />
-            <p className="text-xs font-semibold">Digital Payment</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">PayPal, Apple Pay, etc.</p>
+      {/* ── Deadline Warning ──────────────────────────── */}
+      <section className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5 sm:p-6">
+        <div className="flex items-start gap-3">
+          <Clock className="h-5 w-5 text-destructive mt-0.5 shrink-0" />
+          <div>
+            <h2 className="text-base font-semibold text-destructive">Time-Sensitive</h2>
+            <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+              Please contact us as soon as possible. If this matter is not resolved
+              within a reasonable timeframe, the shipment may be returned to the sender
+              or held at the customs facility subject to additional storage charges.
+            </p>
           </div>
         </div>
       </section>
@@ -282,51 +194,25 @@ function ClearanceView({
       {/* ── What Happens Next ─────────────────────────── */}
       <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-[var(--shadow-card)]">
         <div className="flex items-center gap-2 mb-4">
-          <Info className="h-5 w-5 text-primary" />
-          <h2 className="text-base sm:text-lg font-semibold">What Happens After Payment?</h2>
+          <MessageCircle className="h-5 w-5 text-primary" />
+          <h2 className="text-base sm:text-lg font-semibold">What Happens Next?</h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-3">
           <StepCard
             step="1"
-            title="Payment Confirmation"
-            desc="Once your payment is received and verified, you will receive an email confirmation with a clearance receipt and updated tracking information."
+            title="Email Us"
+            desc="Send an email to our support team with your tracking number. We'll review your case and respond with clear instructions."
           />
           <StepCard
             step="2"
-            title="Customs Release"
-            desc="Your package will be released from the customs facility within 24–48 business hours after payment verification is complete."
+            title="Support Follow-Up"
+            desc="Our customs team will guide you through the resolution process and keep you updated at every step."
           />
           <StepCard
             step="3"
-            title="Final Delivery"
-            desc="The shipment will resume its transit and be delivered to the destination address. Updated ETA will be reflected on your tracking page."
+            title="Package Released"
+            desc="Once the issue is resolved, your package will be released from customs and delivered to your address."
           />
-        </div>
-      </section>
-
-      {/* ── Contact / Support ─────────────────────────── */}
-      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-[var(--shadow-card)]">
-        <div className="flex items-center gap-2 mb-3">
-          <Phone className="h-5 w-5 text-primary" />
-          <h2 className="text-base sm:text-lg font-semibold">Need Assistance?</h2>
-        </div>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          If you have questions about this customs hold or require clarification regarding
-          the clearance fee, our support team is available to assist you.
-        </p>
-        <div className="mt-3 flex flex-col sm:flex-row gap-3">
-          <a
-            href="mailto:customs@parceltrace.com"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm hover:border-primary transition-colors"
-          >
-            <Mail className="h-4 w-4" /> customs@parceltrace.com
-          </a>
-          <a
-            href="tel:+18005551234"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm hover:border-primary transition-colors"
-          >
-            <Phone className="h-4 w-4" /> +1 (800) 555-1234
-          </a>
         </div>
       </section>
 
@@ -334,12 +220,9 @@ function ClearanceView({
       <footer className="rounded-2xl bg-muted/40 border border-border p-4 sm:p-5">
         <p className="text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
           <span className="font-semibold">Disclaimer:</span> ParcelTrace acts as an
-          intermediary logistics and tracking platform. Customs clearance fees are
-          determined and imposed by the relevant government customs authority at the port
-          of entry. ParcelTrace facilitates the collection of these fees on behalf of the
-          customs agency to expedite the clearance and delivery process. All fees collected
-          are remitted directly to the applicable government authority. This notice is
-          issued pursuant to applicable customs regulations and international trade law.
+          intermediary logistics and tracking platform. Customs holds are determined
+          by the relevant government customs authority at the port of entry. Our support
+          team will work with you to resolve the issue as quickly as possible.
           Reference Number:{" "}
           <span className="font-mono font-medium">{hold.referenceNumber}</span>.
         </p>
@@ -368,15 +251,6 @@ function InfoRow({
         {value}
       </p>
     </div>
-  );
-}
-
-function LegalItem({ title, text }: { title: string; text: string }) {
-  return (
-    <li className="pl-4 border-l-2 border-primary/30">
-      <p className="font-semibold text-foreground text-sm">{title}</p>
-      <p className="mt-1">{text}</p>
-    </li>
   );
 }
 

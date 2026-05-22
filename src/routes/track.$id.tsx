@@ -89,13 +89,10 @@ function ShipmentView({ data }: { data: import("@/lib/tracking").Shipment }) {
               <ShieldAlert className="h-5 w-5 text-destructive" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-destructive text-base">Shipment Held — Customs Clearance Required</h3>
+              <h3 className="font-semibold text-destructive text-base">Shipment Held — Customs Action Required</h3>
               <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                Your package has been delayed at customs and requires a clearance fee of{" "}
-                <span className="font-bold text-foreground">
-                  {new Intl.NumberFormat("en-US", { style: "currency", currency: customsHold.feeCurrency }).format(customsHold.feeAmount)}
-                </span>{" "}
-                before delivery can be completed. This is a mandatory regulatory requirement.
+                Your package has been placed on hold by customs. Please contact our support
+                team by email to resolve this issue. We will follow up with instructions.
               </p>
               <a
                 href={`/clearance/${data.tracking_number}`}
@@ -103,7 +100,7 @@ function ShipmentView({ data }: { data: import("@/lib/tracking").Shipment }) {
                 style={{ background: "var(--gradient-primary)" }}
               >
                 <ExternalLink className="h-4 w-4" />
-                View Details & Pay Fee
+                View Details & Contact Support
               </a>
             </div>
           </div>
