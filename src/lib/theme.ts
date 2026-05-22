@@ -18,7 +18,7 @@ function applyTheme(resolved: "light" | "dark") {
   }
   const metaThemeColor = document.querySelector('meta[name="theme-color"]');
   if (metaThemeColor) {
-    metaThemeColor.setAttribute("content", resolved === "dark" ? "#1a1025" : "#ffffff");
+    metaThemeColor.setAttribute("content", resolved === "dark" ? "#000000" : "#ffffff");
   }
 }
 
