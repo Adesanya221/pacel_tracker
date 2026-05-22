@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useDocumentTitle } from "@/lib/useDocumentTitle";
 import { TrackingForm } from "@/components/TrackingForm";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
@@ -23,16 +24,6 @@ import {
 } from "@/components/ui/carousel";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "ParcelTrace — Track Any Package in Real Time" },
-      {
-        name: "description",
-        content:
-          "Enter any tracking number to see a live shipment journey with timeline, route visualization, and delivery ETA.",
-      },
-    ],
-  }),
   component: Index,
 });
 
@@ -121,6 +112,8 @@ const STATS = [
 ];
 
 function Index() {
+  useDocumentTitle("ParcelTrace — Track Any Package in Real Time");
+
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useDocumentTitle } from "@/lib/useDocumentTitle";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, MapPin, Package, Calendar, User, Mail, AlertCircle, ShieldAlert, ExternalLink } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -8,17 +9,12 @@ import { fetchShipment, buildTimeline, getCurrentStatus, getProgress, isValidTra
 import { getCustomsHold } from "@/lib/customs";
 
 export const Route = createFileRoute("/track/$id")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Tracking ${params.id} — ParcelTrace` },
-      { name: "description", content: `Live tracking details for shipment ${params.id}.` },
-    ],
-  }),
   component: TrackPage,
 });
 
 function TrackPage() {
   const { id } = Route.useParams();
+  useDocumentTitle(`Tracking ${id} — ParcelTrace`);
   const valid = isValidTrackingNumber(id);
 
   const { data, isLoading, error } = useQuery({

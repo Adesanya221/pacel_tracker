@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useDocumentTitle } from "@/lib/useDocumentTitle";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
@@ -22,20 +23,12 @@ import { fetchShipment, isValidTrackingNumber } from "@/lib/tracking";
 import { getCustomsHold, type CustomsHold } from "@/lib/customs";
 
 export const Route = createFileRoute("/clearance/$id")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Customs Clearance — ${params.id} — ParcelTrace` },
-      {
-        name: "description",
-        content: `Customs clearance fee details and payment instructions for shipment ${params.id}.`,
-      },
-    ],
-  }),
   component: ClearancePage,
 });
 
 function ClearancePage() {
   const { id } = Route.useParams();
+  useDocumentTitle(`Customs Clearance — ${id} — ParcelTrace`);
   const valid = isValidTrackingNumber(id);
 
   const { data, isLoading } = useQuery({
