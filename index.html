@@ -7,8 +7,63 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO -->
     <title>ParcelTrace — Real-Time Package Tracking</title>
-    <meta name="description" content="Track any shipment in real time with live ETA, route visualization, and delivery milestones." />
+    <meta name="description" content="ParcelTrace provides real-time shipment tracking with live ETA updates, route visualization, milestone timelines, and delivery notifications for packages across the United States." />
+    <meta name="keywords" content="package tracking, shipment tracking, real-time tracking, parcel tracker, delivery status, ETA, logistics, US shipping" />
+    <meta name="author" content="ParcelTrace Inc." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://pacel-tracker.vercel.app/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pacel-tracker.vercel.app/" />
+    <meta property="og:title" content="ParcelTrace — Real-Time Package Tracking" />
+    <meta property="og:description" content="Track any shipment in real time with live ETA updates, route visualization, milestone timelines, and delivery notifications." />
+    <meta property="og:site_name" content="ParcelTrace" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ParcelTrace — Real-Time Package Tracking" />
+    <meta name="twitter:description" content="Track any shipment in real time with live ETA updates, route visualization, milestone timelines, and delivery notifications." />
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "ParcelTrace",
+      "url": "https://pacel-tracker.vercel.app",
+      "description": "Real-time package tracking with live ETA updates, route visualization, and delivery milestones.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "1200 Peachtree St NE, Suite 400",
+        "addressLocality": "Atlanta",
+        "addressRegion": "GA",
+        "postalCode": "30309",
+        "addressCountry": "US"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+1-800-982-7225",
+        "contactType": "customer service",
+        "email": "support@parceltrace.com",
+        "availableLanguage": "English",
+        "areaServed": "US"
+      }
+    }
+    </script>
+
+    <!-- Dark mode FOUC prevention -->
     <script>
       (function(){try{var t=localStorage.getItem('parceltrace_theme');var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches);if(d){document.documentElement.classList.add('dark');var m=document.querySelector('meta[name="theme-color"]');if(m)m.content='#000000'}}catch(e){}})()
     </script>
