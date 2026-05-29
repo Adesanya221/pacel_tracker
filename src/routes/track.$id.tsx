@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { TrackingForm } from "@/components/TrackingForm";
 import { Timeline } from "@/components/Timeline";
 import { fetchShipment, buildTimeline, getCurrentStatus, getProgress, isValidTrackingNumber } from "@/lib/tracking";
-import { getCustomsHold } from "@/lib/customs";
+import { fetchCustomsHold } from "@/lib/customs";
 
 export const Route = createFileRoute("/track/$id")({
   component: TrackPage,
@@ -77,7 +77,10 @@ function ShipmentView({ data }: { data: import("@/lib/tracking").Shipment }) {
   const eta = new Date(data.estimated_delivery_date).toLocaleDateString("en-US", {
     weekday: "long", month: "long", day: "numeric", year: "numeric",
   });
-  const customsHold = getCustomsHold(data.tracking_number);
+  const { data: customsHold } = useQuery({
+    queryKey: ["customs-hold", data.tracking_number],
+    queryFn: () => fetchCustomsHold(data.tracking_number),
+  });
 
   return (
     <div className="space-y-6">

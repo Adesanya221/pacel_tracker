@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { fetchShipment, isValidTrackingNumber } from "@/lib/tracking";
-import { getCustomsHold, type CustomsHold } from "@/lib/customs";
+import { fetchCustomsHold, type CustomsHold } from "@/lib/customs";
 
 export const Route = createFileRoute("/clearance/$id")({
   component: ClearancePage,
@@ -34,7 +34,11 @@ function ClearancePage() {
     enabled: valid,
   });
 
-  const customsHold = valid ? getCustomsHold(id) : null;
+  const { data: customsHold, isLoading: holdLoading } = useQuery({
+    queryKey: ["customs-hold", id],
+    queryFn: () => fetchCustomsHold(id),
+    enabled: valid,
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -48,7 +52,7 @@ function ClearancePage() {
           <ArrowLeft className="h-4 w-4" /> Back to tracking
         </Link>
 
-        {isLoading ? (
+        {isLoading || holdLoading ? (
           <div className="rounded-2xl border border-border bg-card p-12 text-center text-muted-foreground">
             Loading clearance details…
           </div>

@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      customs_holds: {
+        Row: {
+          id: string
+          tracking_number: string
+          enabled: boolean
+          fee_amount: number
+          fee_currency: string
+          reason: string
+          hold_date: string
+          reference_number: string
+          payment_instructions: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tracking_number: string
+          enabled?: boolean
+          fee_amount?: number
+          fee_currency?: string
+          reason?: string
+          hold_date?: string
+          reference_number: string
+          payment_instructions?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tracking_number?: string
+          enabled?: boolean
+          fee_amount?: number
+          fee_currency?: string
+          reason?: string
+          hold_date?: string
+          reference_number?: string
+          payment_instructions?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       shipments: {
         Row: {
           created_at: string

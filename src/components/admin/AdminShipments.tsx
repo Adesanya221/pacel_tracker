@@ -27,9 +27,9 @@ import {
   type StageKey,
 } from "@/lib/tracking";
 import {
-  getCustomsHold,
-  setCustomsHold,
-  clearCustomsHold,
+  fetchCustomsHold,
+  upsertCustomsHold,
+  deleteCustomsHold,
   generateReferenceNumber,
   type CustomsHold,
 } from "@/lib/customs";
@@ -380,37 +380,58 @@ function EmailComposer({
 }
 
 function CustomsHoldPanel({ trackingNumber }: { trackingNumber: string }) {
-  const existing = getCustomsHold(trackingNumber);
-  const [enabled, setEnabled] = useState(existing?.enabled ?? false);
-  const [feeAmount, setFeeAmount] = useState(existing?.feeAmount?.toString() ?? "150");
-  const [feeCurrency, setFeeCurrency] = useState(existing?.feeCurrency ?? "USD");
+  const qc = useQueryClient();
+  const { data: existing, isLoading: holdLoading } = useQuery({
+    queryKey: ["customs-hold", trackingNumber],
+    queryFn: () => fetchCustomsHold(trackingNumber),
+  });
+
+  const [enabled, setEnabled] = useState(false);
+  const [feeAmount, setFeeAmount] = useState("150");
+  const [feeCurrency, setFeeCurrency] = useState("USD");
   const [reason, setReason] = useState(
-    existing?.reason ??
-      "Package held at customs for inspection and regulatory compliance verification."
+    "Package held at customs for inspection and regulatory compliance verification."
   );
   const [paymentInstructions, setPaymentInstructions] = useState(
-    existing?.paymentInstructions ??
-      "Payment must be completed within 48 hours to avoid return-to-sender processing. Accepted methods: credit card, debit card, bank transfer."
+    "Payment must be completed within 48 hours to avoid return-to-sender processing. Accepted methods: credit card, debit card, bank transfer."
   );
+  const [initialized, setInitialized] = useState(false);
 
-  function save(active: boolean) {
-    if (active) {
-      setCustomsHold(trackingNumber, {
-        enabled: true,
-        feeAmount: parseFloat(feeAmount) || 0,
-        feeCurrency,
-        reason,
-        holdDate: existing?.holdDate ?? new Date().toISOString(),
-        referenceNumber: existing?.referenceNumber ?? generateReferenceNumber(),
-        paymentInstructions,
-      });
-      toast.success("Customs hold activated");
-    } else {
-      clearCustomsHold(trackingNumber);
-      toast.success("Customs hold removed");
+  // Sync local state when DB data arrives
+  if (!initialized && !holdLoading) {
+    if (existing) {
+      setEnabled(existing.enabled);
+      setFeeAmount(existing.feeAmount.toString());
+      setFeeCurrency(existing.feeCurrency);
+      setReason(existing.reason);
+      setPaymentInstructions(existing.paymentInstructions);
     }
-    setEnabled(active);
+    setInitialized(true);
   }
+
+  const saveMut = useMutation({
+    mutationFn: async (active: boolean) => {
+      if (active) {
+        await upsertCustomsHold(trackingNumber, {
+          enabled: true,
+          feeAmount: parseFloat(feeAmount) || 0,
+          feeCurrency,
+          reason,
+          holdDate: existing?.holdDate ?? new Date().toISOString(),
+          referenceNumber: existing?.referenceNumber ?? generateReferenceNumber(),
+          paymentInstructions,
+        });
+      } else {
+        await deleteCustomsHold(trackingNumber);
+      }
+    },
+    onSuccess: (_, active) => {
+      qc.invalidateQueries({ queryKey: ["customs-hold", trackingNumber] });
+      setEnabled(active);
+      toast.success(active ? "Customs hold activated" : "Customs hold removed");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   return (
     <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-3">
@@ -426,7 +447,8 @@ function CustomsHoldPanel({ trackingNumber }: { trackingNumber: string }) {
           <input
             type="checkbox"
             checked={enabled}
-            onChange={(e) => save(e.target.checked)}
+            disabled={saveMut.isPending || holdLoading}
+            onChange={(e) => saveMut.mutate(e.target.checked)}
             className="h-4 w-4 accent-destructive"
           />
         </label>
@@ -486,11 +508,12 @@ function CustomsHoldPanel({ trackingNumber }: { trackingNumber: string }) {
             />
           </div>
           <button
-            onClick={() => save(true)}
-            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs sm:text-sm font-semibold text-primary-foreground"
+            onClick={() => saveMut.mutate(true)}
+            disabled={saveMut.isPending}
+            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs sm:text-sm font-semibold text-primary-foreground disabled:opacity-50"
             style={{ background: "var(--gradient-primary)" }}
           >
-            <DollarSign className="h-4 w-4" /> Update Customs Hold
+            <DollarSign className="h-4 w-4" /> {saveMut.isPending ? "Saving…" : "Update Customs Hold"}
           </button>
         </div>
       )}
