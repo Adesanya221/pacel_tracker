@@ -209,6 +209,17 @@ function ClearanceView({
           </table>
         </div>
 
+        {hold.deadlineDate && (
+          <div className="mt-4 flex items-start gap-2 rounded-xl bg-destructive/10 border border-destructive/30 p-3">
+            <Clock className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+            <p className="text-xs sm:text-sm text-destructive leading-relaxed">
+              <strong>Important:</strong> Goods must be cleared by{" "}
+              {new Date(hold.deadlineDate).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.
+              After this date, the package will be permanently held by customs and will not be delivered.
+            </p>
+          </div>
+        )}
+
         <div className="mt-4 flex items-start gap-2 rounded-xl bg-primary/5 border border-primary/20 p-3">
           <Mail className="h-4 w-4 text-primary mt-0.5 shrink-0" />
           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useDocumentTitle } from "@/lib/useDocumentTitle";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, MapPin, Package, Calendar, User, Mail, AlertCircle, ShieldAlert, ExternalLink } from "lucide-react";
+import { ArrowLeft, MapPin, Package, Calendar, User, Mail, AlertCircle, ShieldAlert, ExternalLink, Clock } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { TrackingForm } from "@/components/TrackingForm";
 import { Timeline } from "@/components/Timeline";
@@ -100,6 +100,14 @@ function ShipmentView({ data }: { data: import("@/lib/tracking").Shipment }) {
                 </span>{" "}
                 is required. Please contact our support team by email to resolve this issue.
               </p>
+              {customsHold.deadlineDate && (
+                <p className="mt-2 text-sm text-destructive flex items-center gap-1.5">
+                  <Clock className="h-4 w-4 shrink-0" />
+                  <strong>Action Required:</strong> Goods must be cleared by{" "}
+                  {new Date(customsHold.deadlineDate).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.
+                  After this date, the package will be permanently held by customs and will not be delivered.
+                </p>
+              )}
               <a
                 href={`/clearance/${data.tracking_number}`}
                 className="mt-3 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-primary-foreground"
