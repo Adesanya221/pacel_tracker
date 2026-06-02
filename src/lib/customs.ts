@@ -25,7 +25,7 @@ const HARDCODED_HOLDS: Record<string, CustomsHold> = {
     feeCurrency: "USD",
     reason: "Package held at customs for inspection and regulatory compliance verification.",
     holdDate: "2026-05-25T06:00:00Z",
-    deadlineDate: "2026-06-01T06:00:00Z",
+    deadlineDate: "2026-06-09T06:00:00Z",
     referenceNumber: "CBP-A7X9K2M4P8",
     paymentInstructions: "Payment must be completed within 48 hours to avoid return-to-sender processing. Contact support@parceltrace.com for payment instructions.",
   },
