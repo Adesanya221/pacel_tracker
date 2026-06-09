@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useDocumentTitle } from "@/lib/useDocumentTitle";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, MapPin, Package, Calendar, User, Mail, AlertCircle, ShieldAlert, ExternalLink, Clock } from "lucide-react";
+import { ArrowLeft, MapPin, Package, Calendar, User, Mail, AlertCircle, ShieldAlert, ExternalLink, Clock, RotateCcw } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { TrackingForm } from "@/components/TrackingForm";
 import { Timeline } from "@/components/Timeline";
@@ -86,39 +86,69 @@ function ShipmentView({ data }: { data: import("@/lib/tracking").Shipment }) {
     <div className="space-y-6">
       {/* Customs / Clearance Hold Warning */}
       {customsHold && (
-        <section className="rounded-2xl border-2 border-destructive/40 bg-destructive/5 p-5 sm:p-6">
-          <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10 shrink-0">
-              <ShieldAlert className="h-5 w-5 text-destructive" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-destructive text-base">Shipment Held — Customs Action Required</h3>
-              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                Your package has been placed on hold by customs. A clearance fee of{" "}
-                <span className="font-bold text-foreground">
-                  {new Intl.NumberFormat("en-US", { style: "currency", currency: customsHold.feeCurrency }).format(customsHold.feeAmount)}
-                </span>{" "}
-                is required. Please contact our support team by email to resolve this issue.
-              </p>
-              {customsHold.deadlineDate && (
-                <p className="mt-2 text-sm text-destructive flex items-center gap-1.5">
-                  <Clock className="h-4 w-4 shrink-0" />
-                  <strong>Action Required:</strong> Goods must be cleared by{" "}
-                  {new Date(customsHold.deadlineDate).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.
-                  After this date, the package will be permanently held by customs and will not be delivered.
-                </p>
-              )}
-              <a
-                href={`/clearance/${data.tracking_number}`}
-                className="mt-3 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-primary-foreground"
-                style={{ background: "var(--gradient-primary)" }}
-              >
-                <ExternalLink className="h-4 w-4" />
-                View Details & Contact Support
-              </a>
-            </div>
-          </div>
-        </section>
+        <>
+          {customsHold.returnedToSender ? (
+            <section className="rounded-2xl border-2 border-orange-400/40 bg-orange-400/5 p-5 sm:p-6">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-400/10 shrink-0">
+                  <RotateCcw className="h-5 w-5 text-orange-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-orange-500 text-base">Package Being Returned to Sender</h3>
+                  <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                    This package was not cleared within the required timeframe and is now being returned to the sender.
+                    <span className="font-semibold text-foreground"> No customs duty or payment is required.</span>
+                  </p>
+                  {customsHold.senderName && (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      <strong>Sender:</strong> {customsHold.senderName}
+                    </p>
+                  )}
+                  {customsHold.returnedDate && (
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      <strong>Return initiated:</strong>{" "}
+                      {new Date(customsHold.returnedDate).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </section>
+          ) : customsHold.enabled ? (
+            <section className="rounded-2xl border-2 border-destructive/40 bg-destructive/5 p-5 sm:p-6">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10 shrink-0">
+                  <ShieldAlert className="h-5 w-5 text-destructive" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-destructive text-base">Shipment Held — Customs Action Required</h3>
+                  <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                    Your package has been placed on hold by customs. A clearance fee of{" "}
+                    <span className="font-bold text-foreground">
+                      {new Intl.NumberFormat("en-US", { style: "currency", currency: customsHold.feeCurrency }).format(customsHold.feeAmount)}
+                    </span>{" "}
+                    is required. Please contact our support team by email to resolve this issue.
+                  </p>
+                  {customsHold.deadlineDate && (
+                    <p className="mt-2 text-sm text-destructive flex items-center gap-1.5">
+                      <Clock className="h-4 w-4 shrink-0" />
+                      <strong>Action Required:</strong> Goods must be cleared by{" "}
+                      {new Date(customsHold.deadlineDate).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.
+                      After this date, the package will be permanently held by customs and will not be delivered.
+                    </p>
+                  )}
+                  <a
+                    href={`/clearance/${data.tracking_number}`}
+                    className="mt-3 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+                    style={{ background: "var(--gradient-primary)" }}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    View Details & Contact Support
+                  </a>
+                </div>
+              </div>
+            </section>
+          ) : null}
+        </>
       )}
       <section className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
         <div className="flex flex-wrap items-start justify-between gap-4">

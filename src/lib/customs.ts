@@ -16,18 +16,23 @@ export interface CustomsHold {
   referenceNumber: string;
   paymentInstructions: string;
   deadlineDate?: string;
+  returnedToSender?: boolean;
+  returnedDate?: string;
+  senderName?: string;
 }
 
 const HARDCODED_HOLDS: Record<string, CustomsHold> = {
   "3614262843782321": {
-    enabled: true,
-    feeAmount: 2000,
+    enabled: false,
+    feeAmount: 0,
     feeCurrency: "USD",
-    reason: "Package held at customs for inspection and regulatory compliance verification.",
+    reason: "Package is being returned to the sender due to non-clearance of customs requirements.",
     holdDate: "2026-05-25T06:00:00Z",
-    deadlineDate: "2026-06-09T06:00:00Z",
+    returnedToSender: true,
+    returnedDate: "2026-06-09T06:00:00Z",
+    senderName: "Charité – Universitätsmedizin Berlin",
     referenceNumber: "CBP-A7X9K2M4P8",
-    paymentInstructions: "Payment must be completed within 48 hours to avoid return-to-sender processing. Contact support@parceltrace.com for payment instructions.",
+    paymentInstructions: "No payment is required. The package is being returned to the original sender.",
   },
 };
 

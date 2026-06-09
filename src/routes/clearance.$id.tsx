@@ -14,6 +14,8 @@ import {
   Hash,
   Mail,
   MessageCircle,
+  RotateCcw,
+  User,
 } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { fetchShipment, isValidTrackingNumber } from "@/lib/tracking";
@@ -98,6 +100,90 @@ function ClearanceView({
     day: "numeric",
     year: "numeric",
   });
+
+  if (hold.returnedToSender) {
+    const returnedDate = hold.returnedDate
+      ? new Date(hold.returnedDate).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
+      : "N/A";
+    return (
+      <div className="space-y-6">
+        {/* ── Returned to Sender Banner ─────────────────── */}
+        <section className="rounded-2xl border-2 border-orange-400/40 bg-orange-400/5 p-5 sm:p-6">
+          <div className="flex items-start gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-400/10 shrink-0">
+              <RotateCcw className="h-6 w-6 text-orange-500" />
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-orange-500">
+                Package Being Returned to Sender
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                This package was not cleared within the required timeframe and is now being returned to the original sender.
+                <span className="font-semibold text-foreground"> No customs duty or payment is required.</span>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Return Details ────────────────────────────── */}
+        <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-[var(--shadow-card)]">
+          <div className="flex items-center gap-2 mb-4">
+            <Package2 className="h-5 w-5 text-primary" />
+            <h2 className="text-base sm:text-lg font-semibold">Return Information</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <InfoRow icon={Hash} label="Tracking Number" value={shipment.tracking_number} mono />
+            <InfoRow icon={Hash} label="Customs Reference" value={hold.referenceNumber} mono />
+            <InfoRow icon={MapPin} label="Origin" value={shipment.origin_address} />
+            <InfoRow icon={MapPin} label="Destination" value={shipment.destination_address} />
+            <InfoRow icon={Calendar} label="Shipment Date" value={new Date(shipment.shipment_date).toLocaleDateString()} />
+            <InfoRow icon={Calendar} label="Return Initiated" value={returnedDate} />
+            {hold.senderName && (
+              <div className="sm:col-span-2">
+                <InfoRow icon={User} label="Sender (Return Recipient)" value={hold.senderName} />
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ── Reason for Return ─────────────────────────── */}
+        <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-[var(--shadow-card)]">
+          <div className="flex items-center gap-2 mb-4">
+            <FileText className="h-5 w-5 text-primary" />
+            <h2 className="text-base sm:text-lg font-semibold">Reason for Return</h2>
+          </div>
+          <p className="text-sm text-foreground leading-relaxed">{hold.reason}</p>
+        </section>
+
+        {/* ── No Payment Required Notice ────────────────── */}
+        <section className="rounded-2xl border border-primary/30 bg-primary/5 p-5 sm:p-6">
+          <div className="flex items-start gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 shrink-0">
+              <ShieldAlert className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-foreground">No Payment Required</h2>
+              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                Because this package is being returned to the sender, all customs fees and clearance charges have been waived.
+                The sender will be responsible for any return shipping costs.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Disclaimer ────────────────────────────────── */}
+        <footer className="rounded-2xl bg-muted/40 border border-border p-4 sm:p-5">
+          <p className="text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
+            <span className="font-semibold">Disclaimer:</span> ParcelTrace acts as an
+            intermediary logistics and tracking platform. Return processing is handled
+            by the relevant government customs authority and the originating carrier.
+            Reference Number:{" "}
+            <span className="font-mono font-medium">{hold.referenceNumber}</span>.
+          </p>
+        </footer>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
