@@ -111,11 +111,16 @@ function ShipmentView({ data }: { data: import("@/lib/tracking").Shipment }) {
                     </p>
                   )}
                   {customsHold.returnFeeAmount !== undefined && customsHold.returnFeeCurrency && (
-                    <p className="mt-2 text-sm text-orange-500 font-medium">
-                      <strong>Return shipping fee:</strong>{" "}
-                      {new Intl.NumberFormat("en-US", { style: "currency", currency: customsHold.returnFeeCurrency }).format(customsHold.returnFeeAmount)}{" "}
-                      — payable by the sender ({customsHold.senderName || "sender"}) to ParcelTrace.
-                    </p>
+                    <div className="mt-3 rounded-xl border border-orange-400/20 bg-orange-400/10 p-3">
+                      <p className="text-sm text-orange-500 font-semibold">Return Shipping Fee</p>
+                      <p className="text-lg font-bold text-foreground mt-1">
+                        {new Intl.NumberFormat("en-US", { style: "currency", currency: customsHold.returnFeeCurrency }).format(customsHold.returnFeeAmount)}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Payable by sender ({customsHold.senderName || "sender"}) to ParcelTrace.
+                        Fee covers the cost of returning the package to the original sender.
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>

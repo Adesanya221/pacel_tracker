@@ -32,7 +32,7 @@ const HARDCODED_HOLDS: Record<string, CustomsHold> = {
     holdDate: "2026-05-25T06:00:00Z",
     returnedToSender: true,
     returnedDate: "2026-06-09T06:00:00Z",
-    senderName: "Charité – Universitätsmedizin Berlin",
+    senderName: "Charité - Universitätsmedizin Berlin",
     returnFeeAmount: 500,
     returnFeeCurrency: "USD",
     referenceNumber: "CBP-A7X9K2M4P8",

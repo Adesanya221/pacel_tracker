@@ -157,22 +157,49 @@ function ClearanceView({
 
         {/* ── Return Shipping Fee ───────────────────────── */}
         {hold.returnFeeAmount !== undefined && hold.returnFeeCurrency && (
-          <section className="rounded-2xl border border-orange-400/30 bg-orange-400/5 p-5 sm:p-6">
-            <div className="flex items-start gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-400/10 shrink-0">
-                <CreditCard className="h-6 w-6 text-orange-500" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-orange-500">Return Shipping Fee</h2>
-                <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                  A return shipping fee of{" "}
-                  <span className="font-bold text-foreground">
-                    {new Intl.NumberFormat("en-US", { style: "currency", currency: hold.returnFeeCurrency }).format(hold.returnFeeAmount)}
-                  </span>{" "}
-                  is payable by the sender ({hold.senderName || "sender"}) to ParcelTrace.
-                  This fee covers the cost of returning the package to the original sender.
-                </p>
-              </div>
+          <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-[var(--shadow-card)]">
+            <div className="flex items-center gap-2 mb-4">
+              <CreditCard className="h-5 w-5 text-orange-500" />
+              <h2 className="text-base sm:text-lg font-semibold">Return Shipping Fee</h2>
+            </div>
+
+            <div className="rounded-xl border border-border overflow-hidden">
+              <table className="w-full text-sm">
+                <tbody>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-3 text-muted-foreground">Return Shipping</td>
+                    <td className="px-4 py-3 text-right font-medium">
+                      {new Intl.NumberFormat("en-US", { style: "currency", currency: hold.returnFeeCurrency }).format(hold.returnFeeAmount * 0.7)}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-3 text-muted-foreground">Handling & Processing</td>
+                    <td className="px-4 py-3 text-right font-medium">
+                      {new Intl.NumberFormat("en-US", { style: "currency", currency: hold.returnFeeCurrency }).format(hold.returnFeeAmount * 0.2)}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-3 text-muted-foreground">Documentation Fee</td>
+                    <td className="px-4 py-3 text-right font-medium">
+                      {new Intl.NumberFormat("en-US", { style: "currency", currency: hold.returnFeeCurrency }).format(hold.returnFeeAmount * 0.1)}
+                    </td>
+                  </tr>
+                  <tr className="bg-muted/30">
+                    <td className="px-4 py-3 font-semibold text-foreground">Total Return Fee</td>
+                    <td className="px-4 py-3 text-right font-bold text-lg text-foreground">
+                      {new Intl.NumberFormat("en-US", { style: "currency", currency: hold.returnFeeCurrency }).format(hold.returnFeeAmount)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-4 rounded-xl bg-orange-400/10 border border-orange-400/20 p-3">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                <span className="font-semibold text-foreground">Responsible Party:</span>{" "}
+                This fee is payable by the sender ({hold.senderName || "sender"}) to ParcelTrace.
+                The recipient is not responsible for this charge.
+              </p>
             </div>
           </section>
         )}
