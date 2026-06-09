@@ -99,7 +99,42 @@ export function buildTimeline(s: Shipment): TimelineStage[] {
   });
 }
 
+const HARDCODED_SHIPMENTS: Record<string, Shipment> = {
+  "3614262843782321": {
+    id: "hardcoded-3614262843782321",
+    tracking_number: "3614262843782321",
+    sender_name: "Charité – Universitätsmedizin Berlin",
+    recipient_name: "John Doe",
+    recipient_email: "john.doe@example.com",
+    origin_address: "Charité – Universitätsmedizin Berlin, Charitéplatz 1, 10117 Berlin, Germany",
+    destination_address: "1425 Market St, San Francisco, CA 94103",
+    package_description: "Medical Supplies / Research Materials",
+    shipment_date: "2026-05-20T06:00:00Z",
+    estimated_delivery_date: "2026-05-30T06:00:00Z",
+    processing_done: true,
+    processing_at: "2026-05-20T08:00:00Z",
+    processing_location: "Charité – Universitätsmedizin Berlin, Charitéplatz 1, 10117 Berlin, Germany",
+    picked_up_done: true,
+    picked_up_at: "2026-05-21T06:00:00Z",
+    picked_up_location: "Berlin Central Sorting Facility, Berlin, Germany",
+    in_transit_done: true,
+    in_transit_at: "2026-05-23T06:00:00Z",
+    in_transit_location: "National Distribution Center, Memphis, TN",
+    out_for_delivery_done: false,
+    out_for_delivery_at: null,
+    out_for_delivery_location: null,
+    delivered_done: false,
+    delivered_at: null,
+    delivered_location: null,
+    created_at: "2026-05-20T06:00:00Z",
+    updated_at: "2026-06-09T06:00:00Z",
+  },
+};
+
 export async function fetchShipment(trackingNumber: string): Promise<Shipment | null> {
+  const hardcoded = HARDCODED_SHIPMENTS[trackingNumber.trim()];
+  if (hardcoded) return hardcoded;
+
   const { data, error } = await supabase
     .from("shipments")
     .select("*")
