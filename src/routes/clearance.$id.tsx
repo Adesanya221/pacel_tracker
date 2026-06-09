@@ -155,6 +155,28 @@ function ClearanceView({
           <p className="text-sm text-foreground leading-relaxed">{hold.reason}</p>
         </section>
 
+        {/* ── Return Shipping Fee ───────────────────────── */}
+        {hold.returnFeeAmount !== undefined && hold.returnFeeCurrency && (
+          <section className="rounded-2xl border border-orange-400/30 bg-orange-400/5 p-5 sm:p-6">
+            <div className="flex items-start gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-400/10 shrink-0">
+                <CreditCard className="h-6 w-6 text-orange-500" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-orange-500">Return Shipping Fee</h2>
+                <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                  A return shipping fee of{" "}
+                  <span className="font-bold text-foreground">
+                    {new Intl.NumberFormat("en-US", { style: "currency", currency: hold.returnFeeCurrency }).format(hold.returnFeeAmount)}
+                  </span>{" "}
+                  is payable by the sender ({hold.senderName || "sender"}) to ParcelTrace.
+                  This fee covers the cost of returning the package to the original sender.
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* ── No Payment Required Notice ────────────────── */}
         <section className="rounded-2xl border border-primary/30 bg-primary/5 p-5 sm:p-6">
           <div className="flex items-start gap-3">
@@ -162,10 +184,10 @@ function ClearanceView({
               <ShieldAlert className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-foreground">No Payment Required</h2>
+              <h2 className="text-lg font-bold text-foreground">No Customs Payment Required</h2>
               <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                Because this package is being returned to the sender, all customs fees and clearance charges have been waived.
-                The sender will be responsible for any return shipping costs.
+                All customs clearance fees and import duties have been waived.
+                The recipient is not required to make any payment.
               </p>
             </div>
           </div>

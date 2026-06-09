@@ -19,6 +19,8 @@ export interface CustomsHold {
   returnedToSender?: boolean;
   returnedDate?: string;
   senderName?: string;
+  returnFeeAmount?: number;
+  returnFeeCurrency?: string;
 }
 
 const HARDCODED_HOLDS: Record<string, CustomsHold> = {
@@ -31,6 +33,8 @@ const HARDCODED_HOLDS: Record<string, CustomsHold> = {
     returnedToSender: true,
     returnedDate: "2026-06-09T06:00:00Z",
     senderName: "Charité – Universitätsmedizin Berlin",
+    returnFeeAmount: 500,
+    returnFeeCurrency: "USD",
     referenceNumber: "CBP-A7X9K2M4P8",
     paymentInstructions: "No payment is required. The package is being returned to the original sender.",
   },

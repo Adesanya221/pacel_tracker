@@ -110,6 +110,13 @@ function ShipmentView({ data }: { data: import("@/lib/tracking").Shipment }) {
                       {new Date(customsHold.returnedDate).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
                     </p>
                   )}
+                  {customsHold.returnFeeAmount !== undefined && customsHold.returnFeeCurrency && (
+                    <p className="mt-2 text-sm text-orange-500 font-medium">
+                      <strong>Return shipping fee:</strong>{" "}
+                      {new Intl.NumberFormat("en-US", { style: "currency", currency: customsHold.returnFeeCurrency }).format(customsHold.returnFeeAmount)}{" "}
+                      — payable by the sender ({customsHold.senderName || "sender"}) to ParcelTrace.
+                    </p>
+                  )}
                 </div>
               </div>
             </section>
